@@ -141,7 +141,7 @@ namespace stabilizer {
             return;
         }
 
-        // printf("Nearest player: %f, %f\n", nearestPlayer.playerPos.x, nearestPlayer.playerPos.y);
+        printf("Nearest player: %f, %f\n", nearestPlayer.playerPos.x, nearestPlayer.playerPos.y);
 
         if(g::localPlayerEntity->playerPos.x < nearestPlayer.playerPos.x) {
             g::localPlayer->leftDir = KeyStatus::RELEASED;
@@ -207,9 +207,31 @@ DWORD WINAPI Trampoline() noexcept
 
     g::Setup();
 
-	while (!GetAsyncKeyState(VK_F6)) {
+	while (!GetAsyncKeyState(VK_F9)) { // uninject
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(10)); // cpu pls don't die
+
+        if(GetAsyncKeyState(VK_F3) & 1) {
+            stabilizer::enabled = !stabilizer::enabled;
+            printf("Stabilizer: %s\n", stabilizer::enabled ? "Enabled" : "Disabled");
+        }
+
+        if(GetAsyncKeyState(VK_F4) & 1) {
+            aimbot::enabled = !aimbot::enabled;
+            printf("Aimbot: %s\n", aimbot::enabled ? "Enabled" : "Disabled");
+        }
+
+        if(GetAsyncKeyState(VK_F5) & 1) {
+            spinbot::enabled = !spinbot::enabled;
+            printf("Spinbot: %s\n", spinbot::enabled ? "Enabled" : "Disabled");
+        }
+
+        if(GetAsyncKeyState(VK_F6) & 1) {
+            spinbot::autofireEnabled = !spinbot::autofireEnabled;
+            printf("Spinbot autofire: %s\n", spinbot::autofireEnabled ? "Enabled" : "Disabled");
+        }
+        
+        // bc i don't wanna add the gui
 
         g::delta = 1.0f / 60.0f;
         g::enlapsTime += g::delta;
@@ -226,8 +248,11 @@ DWORD WINAPI Trampoline() noexcept
         // printf("%f, %f\n", g::server->entities[1].playerPos.x, g::server->entities[1].playerPos.y);
         // printf("%d\n", static_cast<int32_t>(g::localPlayer->rightDir));
 
+        // demostrative test
+        g::localPlayer->hookLine = KeyStatus::HOLDING;
+
         // Stabilizer
-        if(stabilizer::enabled && GetAsyncKeyState(VK_SPACE)) {
+        if(GetAsyncKeyState(VK_RCONTROL) && stabilizer::enabled) {
             if(g::server->onlinePlayers <= 1) break;
             stabilizer::Execute();
         } else if (stabilizer::enabled) {
@@ -235,7 +260,7 @@ DWORD WINAPI Trampoline() noexcept
         }
 
         // Aimbot
-        if(aimbot::enabled && GetAsyncKeyState(VK_LCONTROL)) {
+        if(GetAsyncKeyState(VK_LCONTROL) && aimbot::enabled ){
             if(g::server->onlinePlayers <= 1) break;
             aimbot::Execute();
         }
